@@ -1,0 +1,16 @@
+dat <- read.csv("./exdata-data-household_power_consumption/household_power_consumption.txt", sep = ";", colClasses = "character")
+dat["time"] <- NA
+dat$time <- paste(dat$Date, dat$Time)
+dat[, 1] <- as.Date(dat$Date, format = "%d/%m/%Y", tz = "UTC")
+dat1 <- dat[which(dat$Date == "2007-02-01" | dat$Date == "2007-02-02"), ]
+dat1$time <- strptime(dat1$time, format = "%d/%m/%Y %H:%M:%S", tz = "UCT")
+dat1$Global_active_power <- as.numeric(dat1$Global_active_power)
+dat1$Voltage <- as.numeric(dat1$Voltage)
+dat1$Global_reactive_power <- as.numeric(dat1$Global_reactive_power)
+datmeter <- as.numeric(c(dat1$Sub_metering_1, dat1$Sub_metering_2, dat1$Sub_metering_3))
+dattime <- rep(dat1$time, 3)
+datkind <- c(rep(1, length(dat1$time)), rep(2, length(dat1$time)), rep(3, length(dat1$time)))
+datsubmeter <- data.frame(datmeter, dattime, datkind)
+png("plot2.png")
+with(dat1, plot(time, Global_active_power, type = "l", xlab = "", ylab = "Global Active Power (kilowatts)"))
+dev.off()
